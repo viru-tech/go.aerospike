@@ -77,6 +77,24 @@ func TestUnmarshal(t *testing.T) {
 			},
 		},
 		{
+			name: "bool",
+			want: &struct {
+				Bool bool `as:"bool"`
+			}{
+				Bool: true,
+			},
+			args: args{
+				v: &struct {
+					Bool bool `as:"bool"`
+				}{},
+				record: &aerospike.Record{
+					Bins: map[string]any{
+						"bool": true,
+					},
+				},
+			},
+		},
+		{
 			name: "string and string alias",
 			want: &struct {
 				Text  string    `as:"text"`

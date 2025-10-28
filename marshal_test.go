@@ -54,6 +54,17 @@ func TestMarshal(t *testing.T) {
 			},
 		},
 		{
+			name: "bool",
+			in: &struct {
+				Bool bool `as:"bool"`
+			}{
+				Bool: true,
+			},
+			want: map[string]any{
+				"bool": true,
+			},
+		},
+		{
 			name: "string and string alias",
 			in: &struct {
 				Text  string    `as:"text"`

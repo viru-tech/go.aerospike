@@ -70,6 +70,8 @@ func convertValue(v reflect.Value) (any, error) {
 	}
 
 	switch v.Kind() {
+	case reflect.Bool:
+		return v.Bool(), nil
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
 		return v.Int(), nil
 	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:

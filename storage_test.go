@@ -23,6 +23,7 @@ type testStruct struct {
 	UInt64    uint64            `as:"uint64"`
 	Float32   float32           `as:"float32"`
 	Float64   float64           `as:"float64"`
+	Bool      bool              `as:"bool"`
 	Text      string            `as:"text"`
 	MapStrStr map[string]string `as:"map_str_str"`
 	MapInt    map[int]int       `as:"map_int"`
@@ -41,6 +42,7 @@ type innerStruct struct {
 	UInt64    uint64            `as:"uint64"`
 	Float32   float32           `as:"float32"`
 	Float64   float64           `as:"float64"`
+	Bool      bool              `as:"bool"`
 	Text      string            `as:"text"`
 	MapStrStr map[string]string `as:"map_str_str"`
 	MapInt    map[int]int       `as:"map_int"`
@@ -58,6 +60,7 @@ var allFieldsStruct = testStruct{
 	UInt64:  5,
 	Float32: 6.7,
 	Float64: 8.9,
+	Bool:    true,
 	Text:    "string",
 	MapStrStr: map[string]string{
 		"key": "value",
@@ -75,6 +78,7 @@ var allFieldsStruct = testStruct{
 		UInt64:  14,
 		Float32: 15,
 		Float64: 16,
+		Bool:    true,
 		Text:    "17",
 		MapStrStr: map[string]string{
 			"key2": "value2",

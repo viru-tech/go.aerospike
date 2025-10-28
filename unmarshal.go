@@ -138,6 +138,8 @@ func unmarshalMap(field reflect.Value, v any) (any, error) {
 
 func unmarshalScalarToKind(kind reflect.Kind, value any) (any, error) {
 	switch kind {
+	case reflect.Bool:
+		return value, nil
 	case reflect.String:
 		return value, nil
 	case reflect.Uint64:
