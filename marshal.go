@@ -74,6 +74,10 @@ func marshalStruct(v reflect.Value) (map[string]any, error) {
 func convertValue(v reflect.Value) (any, error) {
 	realValue := v.Interface()
 	if timeVal, ok := realValue.(time.Time); ok {
+		if timeVal.IsZero() {
+			return 0, nil
+		}
+
 		return timeVal.Unix(), nil
 	}
 
