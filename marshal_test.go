@@ -225,6 +225,23 @@ func TestMarshal(t *testing.T) {
 	}
 }
 
+func TestOmitempty(t *testing.T) {
+	t.Parallel()
+	t.Run("empty bins are still being written", func(t *testing.T) {
+		t.Parallel()
+		data := &struct {
+			BoolNoOmit bool `as:"no_omit"`
+			BoolOmit   bool `as:"omit,omitempty"`
+		}{}
+		got, err := Marshal(data)
+		require.NoError(t, err)
+		_, ok := got["no_omit"]
+		require.True(t, ok)
+		_, ok = got["omit"]
+		require.False(t, ok)
+	})
+}
+
 func BenchmarkMarshal(b *testing.B) {
 	b.ResetTimer()
 	b.ReportAllocs()
