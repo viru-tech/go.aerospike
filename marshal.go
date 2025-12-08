@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"reflect"
+	"strings"
 	"time"
 
 	"github.com/aerospike/aerospike-client-go/v8"
@@ -46,10 +47,17 @@ func marshalStruct(v reflect.Value) (map[string]any, error) {
 			continue
 		}
 
+		omit := false
+		opts := strings.SplitN(tag, ",", 1)
+		if len(opts) == 2 && opts[1] == "omitempty" {
+			omit = true
+		}
+
 		field := v.Field(i)
-		if field.IsZero() {
+		if field.IsZero() && omit {
 			continue
 		}
+
 		if field.Kind() == reflect.Ptr {
 			field = reflect.Indirect(field)
 		}
@@ -66,6 +74,10 @@ func marshalStruct(v reflect.Value) (map[string]any, error) {
 func convertValue(v reflect.Value) (any, error) {
 	realValue := v.Interface()
 	if timeVal, ok := realValue.(time.Time); ok {
+		if timeVal.IsZero() {
+			return 0, nil
+		}
+
 		return timeVal.Unix(), nil
 	}
 

@@ -162,17 +162,21 @@ func TestMarshal(t *testing.T) {
 			},
 			want: map[string]any{
 				"nested": map[string]any{
-					"int":      int64(10),
-					"int32":    int64(11),
-					"uint32":   int64(12),
-					"int64":    int64(13),
-					"uint64":   int64(14),
-					"float32":  float64(15),
-					"float64":  float64(16),
-					"text":     "17",
-					"time":     time.Date(2025, 10, 24, 12, 51, 0, 0, time.UTC).Unix(),
-					"duration": int64(60000000000),
-					"alias":    "alias2",
+					"int":         int64(10),
+					"int32":       int64(11),
+					"uint32":      int64(12),
+					"int64":       int64(13),
+					"uint64":      int64(14),
+					"float32":     float64(15),
+					"float64":     float64(16),
+					"text":        "17",
+					"time":        time.Date(2025, 10, 24, 12, 51, 0, 0, time.UTC).Unix(),
+					"duration":    int64(60000000000),
+					"alias":       "alias2",
+					"bool":        false,
+					"map_int":     map[any]any{},
+					"map_str_str": map[any]any{},
+					"slice":       []any{},
 				},
 			},
 		},
@@ -190,7 +194,34 @@ func TestMarshal(t *testing.T) {
 				},
 			},
 			want: map[string]any{
+				"int":         int64(0),
+				"int32":       int64(0),
+				"uint32":      int64(0),
+				"int64":       int64(0),
+				"uint64":      int64(0),
+				"float32":     float64(0),
+				"float64":     float64(0),
+				"text":        "",
+				"time":        0,
+				"duration":    int64(0),
+				"alias":       "",
+				"bool":        false,
+				"map_int":     map[any]any{},
+				"map_str_str": map[any]any{},
+				"slice":       []any{},
 				"nested": map[string]any{
+					"int":         int64(0),
+					"int32":       int64(0),
+					"uint32":      int64(0),
+					"int64":       int64(0),
+					"uint64":      int64(0),
+					"float32":     float64(0),
+					"float64":     float64(0),
+					"text":        "",
+					"time":        0,
+					"duration":    int64(0),
+					"alias":       "",
+					"bool":        false,
 					"map_str_str": map[any]any{"key2": "value2"},
 					"map_int":     map[any]any{int64(3): int64(4)},
 					"slice":       []any{int64(4), int64(5), int64(6)},
@@ -208,9 +239,37 @@ func TestMarshal(t *testing.T) {
 				},
 			},
 			want: map[string]any{
+				"int":         int64(0),
+				"int32":       int64(0),
+				"uint32":      int64(0),
+				"int64":       int64(0),
+				"uint64":      int64(0),
+				"float32":     float64(0),
+				"float64":     float64(0),
+				"text":        "",
+				"time":        0,
+				"duration":    int64(0),
+				"alias":       "",
+				"bool":        false,
+				"map_int":     map[any]any{},
+				"map_str_str": map[any]any{},
+				"slice":       []any{},
 				"nested": map[string]any{
-					"map_int": map[any]any{int64(3): int64(4)},
-					"slice":   []any{int64(4), int64(5), int64(6)},
+					"int":         int64(0),
+					"int32":       int64(0),
+					"uint32":      int64(0),
+					"int64":       int64(0),
+					"uint64":      int64(0),
+					"float32":     float64(0),
+					"float64":     float64(0),
+					"text":        "",
+					"time":        0,
+					"duration":    int64(0),
+					"alias":       "",
+					"bool":        false,
+					"map_int":     map[any]any{int64(3): int64(4)},
+					"slice":       []any{int64(4), int64(5), int64(6)},
+					"map_str_str": map[any]any{},
 				},
 			},
 		},
@@ -223,6 +282,23 @@ func TestMarshal(t *testing.T) {
 			require.Equal(t, tt.want, gotMap)
 		})
 	}
+}
+
+func TestOmitempty(t *testing.T) {
+	t.Parallel()
+	t.Run("empty bins are still being written", func(t *testing.T) {
+		t.Parallel()
+		data := &struct {
+			BoolNoOmit bool `as:"no_omit"`
+			BoolOmit   bool `as:"omit,omitempty"`
+		}{}
+		got, err := Marshal(data)
+		require.NoError(t, err)
+		_, ok := got["no_omit"]
+		require.True(t, ok)
+		_, ok = got["omit"]
+		require.False(t, ok)
+	})
 }
 
 func BenchmarkMarshal(b *testing.B) {
