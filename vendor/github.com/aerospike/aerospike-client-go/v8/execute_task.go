@@ -18,6 +18,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/aerospike/aerospike-client-go/v8/internal/version"
 	"github.com/aerospike/aerospike-client-go/v8/types"
 )
 
@@ -36,7 +37,7 @@ type ExecuteTask struct {
 // NewExecuteTask initializes task with fields needed to query server nodes.
 func NewExecuteTask(cluster *Cluster, statement *Statement, taskId uint64) *ExecuteTask {
 	return &ExecuteTask{
-		baseTask: newTask(cluster),
+		baseTask: newTask(cluster, 0),
 		taskID:   taskId,
 		scan:     statement.IsScan(),
 		observed: make(map[string]struct{}, len(cluster.GetNodes())),
@@ -58,14 +59,22 @@ func (etsk *ExecuteTask) IsDone() (bool, Error) {
 	}
 
 	taskId := strconv.FormatUint(etsk.taskID, 10)
-
-	cmd1 := "query-show:trid=" + taskId
-	cmd2 := module + "-show:trid=" + taskId
-	cmd3 := "jobs:module=" + module + ";cmd=get-job;trid=" + taskId
-
 	nodes := etsk.cluster.GetNodes()
-
 	for _, node := range nodes {
+		serverVersion := node.GetServerVersion()
+		cmd1 := types.Ternary(
+			serverVersion.IsGreaterOrEqual(version.ServerVersion_8_1),
+			"query-show:id=" + taskId ,
+			"query-show:trid=" + taskId)	
+		cmd2 := types.Ternary(
+			serverVersion.IsGreaterOrEqual(version.ServerVersion_8_1), 
+			module + "-show:id=" + taskId , 
+			module + "-show:trid=" + taskId) 
+		cmd3 := types.Ternary(
+			serverVersion.IsGreaterOrEqual(version.ServerVersion_8_1), 
+			"jobs:module=" + module + ";cmd=get-job;id=" + taskId , 
+			"jobs:module=" + module + ";cmd=get-job;trid=" + taskId)	
+
 		var command string
 		if node.SupportsPartitionQuery() {
 			// query-show works for both scan and query.
